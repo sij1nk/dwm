@@ -46,6 +46,7 @@
 #include <sys/sysctl.h>
 #include <kvm.h>
 #endif /* __OpenBSD */
+#include <pango/pango.h>
 
 #include "drw.h"
 #include "util.h"
@@ -62,7 +63,8 @@
 #define WIDTH(X)                ((X)->w + 2 * (X)->bw)
 #define HEIGHT(X)               ((X)->h + 2 * (X)->bw)
 #define TAGMASK                 ((1 << LENGTH(tags)) - 1)
-#define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
+#define TEXTW(X)                (drw_font_getwidth(drw, (X), False) + lrpad)
+#define TEXTWM(X)                (drw_font_getwidth(drw, (X), True) + lrpad)
 
 #define GAP_TOGGLE 100
 #define GAP_RESET  0
@@ -283,7 +285,7 @@ static pid_t winpid(Window w);
 
 /* variables */
 static const char broken[] = "broken";
-static char stext[256];
+static char stext[512];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
@@ -849,16 +851,16 @@ void
 drawbar(Monitor *m)
 {
     int x, w, tw = 0;
-    int boxs = drw->fonts->h / 9;
-    int boxw = drw->fonts->h / 6 + 2;
+    int boxs = drw->font->h / 9;
+    int boxw = drw->font->h / 6 + 2;
     unsigned int i, occ = 0, urg = 0;
     Client *c;
 
     /* draw status first so it can be overdrawn by tags later */
     if (m == selmon) { /* status is only drawn on selected monitor */
         drw_setscheme(drw, scheme[SchemeNorm]);
-        tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
-        drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
+        tw = TEXTWM(stext) - lrpad + 2; /* 2px right padding */
+        drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0, True);
     }
 
     for (c = m->clients; c; c = c->next) {
@@ -874,12 +876,12 @@ drawbar(Monitor *m)
 
         w = TEXTW(tags[i]);
         drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
-        drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+        drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i, False);
         x += w;
     }
     w = blw = TEXTW(m->ltsymbol);
     drw_setscheme(drw, scheme[SchemeNorm]);
-    x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
+    x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0, False);
 
     if ((w = m->ww - tw - x) > bh) {
         drw_setscheme(drw, scheme[SchemeNorm]);
@@ -1781,10 +1783,10 @@ setup(void)
     sh = DisplayHeight(dpy, screen);
     root = RootWindow(dpy, screen);
     drw = drw_create(dpy, screen, root, sw, sh);
-    if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
+    if (!drw_font_create(drw, font))
         die("no fonts could be loaded.");
-    lrpad = drw->fonts->h;
-    bh = drw->fonts->h + 2;
+    lrpad = drw->font->h;
+    bh = drw->font->h + 2;
     updategeom();
     /* init atoms */
     utf8string = XInternAtom(dpy, "UTF8_STRING", False);
@@ -1834,7 +1836,6 @@ setup(void)
     grabkeys();
     focus(NULL);
 }
-
 
 void
 seturgent(Client *c, int urg)
@@ -2313,7 +2314,7 @@ void
 updatestatus(void)
 {
     if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
-        strcpy(stext, "dwm-"VERSION);
+        strcpy(stext, "<span bgcolor=\"#ffffff\" size=\"100\">COCK</span>");
     drawbar(selmon);
 }
 
