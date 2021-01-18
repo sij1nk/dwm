@@ -53,10 +53,12 @@ static const Layout layouts[] = {
 #define Shift ShiftMask
 #define Ctrl  ControlMask
 #define TAGKEYS(KEY,TAG) \
-	{ Super,                       KEY,      view,           {.ui = 1 << TAG} }, \
-	{ Super|Ctrl,           KEY,      toggleview,     {.ui = 1 << TAG} }, \
-	{ Super|Shift,             KEY,      tag,            {.ui = 1 << TAG} }, \
-	{ Super|Ctrl|Shift, KEY,      toggletag,      {.ui = 1 << TAG} },
+	{ Super,            KEY,      view,           {.ui = 1 << TAG} }, \
+	{ Super|Ctrl,       KEY,      toggleview,     {.ui = 1 << TAG} }, \
+	{ Super|Shift,      KEY,      tag,            {.ui = 1 << TAG} }, \
+	{ Super|Ctrl|Shift, KEY,      toggletag,      {.ui = 1 << TAG} }, \
+	{ Super|Alt,        KEY,      tagnextmon,     {.ui = 1 << TAG} }, \
+	{ Super|Alt|Shift,  KEY,      tagprevmon,     {.ui = 1 << TAG} },
 
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
