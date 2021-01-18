@@ -2,6 +2,7 @@
 
 /* appearance */
 static const unsigned int borderpx  = 1;        /* border pixel of windows */
+static const Gap default_gap        = {.isgap = 1, .realgap = 10, .gappx = 10};
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int swallowfloating    = 0;        /* 1 means swallow floating windows by default */
 static const int showbar            = 1;        /* 0 means no bar */
@@ -91,6 +92,10 @@ static Key keys[] = {
 	{ Super,                       XK_period, focusmon,       {.i = +1 } },
 	{ Super|Shift,                 XK_comma,  tagmon,         {.i = -1 } },
 	{ Super|Shift,                 XK_period, tagmon,         {.i = +1 } },
+	{ Super,                       XK_minus,  setgaps,        {.i = -5 } },
+	{ Super,                       XK_equal,  setgaps,        {.i = +5 } },
+	{ Super|Shift,                 XK_minus,  setgaps,        {.i = GAP_RESET } },
+	{ Super|Shift,                 XK_equal,  setgaps,        {.i = GAP_TOGGLE} },
 	TAGKEYS(                       XK_1,                      0)
 	TAGKEYS(                       XK_2,                      1)
 	TAGKEYS(                       XK_3,                      2)
