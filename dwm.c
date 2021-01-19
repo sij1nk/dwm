@@ -2314,7 +2314,7 @@ void
 updatestatus(void)
 {
     if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
-        strcpy(stext, "<span bgcolor=\"#ffffff\" size=\"100\">COCK</span>");
+        strcpy(stext, "<span bgcolor=\"#ffffff\">COCK🔊</span>");
     drawbar(selmon);
 }
 
