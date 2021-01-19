@@ -859,8 +859,8 @@ drawbar(Monitor *m)
     /* draw status first so it can be overdrawn by tags later */
     if (m == selmon) { /* status is only drawn on selected monitor */
         drw_setscheme(drw, scheme[SchemeNorm]);
-        tw = TEXTWM(stext) - lrpad + 2; /* 2px right padding */
-        drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0, True);
+        tw = TEXTWM(stext); /* 2px right padding */
+        drw_text(drw, m->ww - tw, 0, tw, bh, 0, lrpad / 2, stext, 0, True);
     }
 
     for (c = m->clients; c; c = c->next) {
@@ -1785,8 +1785,8 @@ setup(void)
     drw = drw_create(dpy, screen, root, sw, sh);
     if (!drw_font_create(drw, font))
         die("no fonts could be loaded.");
-    lrpad = drw->font->h;
-    bh = drw->font->h + 2;
+    lrpad = drw->font->h + horizpadbar;
+    bh = drw->font->h + vertpadbar;
     updategeom();
     /* init atoms */
     utf8string = XInternAtom(dpy, "UTF8_STRING", False);
