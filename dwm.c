@@ -285,7 +285,7 @@ static pid_t winpid(Window w);
 
 /* variables */
 static const char broken[] = "broken";
-static char stext[512];
+static char stext[2048];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh, blw = 0;      /* bar geometry */
@@ -2314,7 +2314,7 @@ void
 updatestatus(void)
 {
     if (!gettextprop(root, XA_WM_NAME, stext, sizeof(stext)))
-        strcpy(stext, "<span bgcolor=\"#ffffff\">COCK🔊</span>");
+        strcpy(stext, "dwm");
     drawbar(selmon);
 }
 

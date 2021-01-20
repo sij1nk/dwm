@@ -165,7 +165,7 @@ drw_rect(Drw *drw, int x, int y, unsigned int w, unsigned int h, int filled, int
 int
 drw_text(Drw *drw, int x, int y, unsigned int w, unsigned int h, unsigned int lpad, const char *text, int invert, Bool markup)
 {
-	char buf[1024];
+	char buf[2048];
 	int ty, th;
 	unsigned int ew, eh;
 	XftDraw *d = NULL;
