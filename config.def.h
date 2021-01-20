@@ -8,9 +8,9 @@ static const int swallowfloating    = 0;        /* 1 means swallow floating wind
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const int viewontag          = 1;        /* follow window to tag it's being moved to */
-static const char font[]            = "monospace 16";
-static const int horizpadbar        = 8;        /* horizontal padding for statusbar */
-static const int vertpadbar         = 4;        /* vertical padding for statusbar */
+static const char font[]            = "Jetbrains Mono  Medium 10";
+static const int horizpadbar        = 0;        /* horizontal padding for statusbar */
+static const int vertpadbar         = 20;        /* vertical padding for statusbar */
 static const char dmenufont[]       = "monospace:size=10";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
