@@ -2229,6 +2229,8 @@ updategeom(void)
                     attachBelow(c);
                     attachstack(c);
                 }
+		if (m == selmon)
+		    selmon = mons;
                 if (m == statmon)
                     statmon = mons;
                 cleanupmon(m);
