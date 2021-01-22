@@ -45,10 +45,10 @@ static int resizehints = 1;    /* 1 means respect size hints in tiled resizals *
 
 static const Layout layouts[] = {
 	/* symbol                  arrange function */
-	{ "<span size=\"20000\" foreground=\"#b24d1b\">󰕮</span>",      tile },    /* first entry is default */
-	{ "<span size=\"20000\" foreground=\"#b24d1b\">󰅟</span>",      NULL },    /* no layout function means floating behavior */
-	{ "<span size=\"20000\" foreground=\"#b24d1b\">󰕬</span>",      tcl },     /* three column layout */
-	{ "<span size=\"20000\" foreground=\"#b24d1b\">󰝣</span>",      monocle },
+	{ "<span size=\"20000\" foreground=\"#435766\">󰕮</span>",      tile },    /* first entry is default */
+	{ "<span size=\"20000\" foreground=\"#435766\">󰅟</span>",      NULL },    /* no layout function means floating behavior */
+	{ "<span size=\"20000\" foreground=\"#435766\">󰕬</span>",      tcl },     /* three column layout */
+	{ "<span size=\"20000\" foreground=\"#435766\">󰝣</span>",      monocle },
 };
 
 /* key definitions */
