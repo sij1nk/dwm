@@ -142,7 +142,7 @@ typedef struct {
 typedef struct Pertag Pertag;
 
 struct Monitor {
-    char ltsymbol[16];
+    char ltsymbol[56];
     float mfact;
     int nmaster;
     int num;
@@ -177,15 +177,15 @@ typedef struct {
 
 /* Xresources preferences */
 enum resource_type {
-	STRING = 0,
-	INTEGER = 1,
-	FLOAT = 2
+    STRING = 0,
+    INTEGER = 1,
+    FLOAT = 2
 };
 
 typedef struct {
-	char *name;
-	enum resource_type type;
-	void *dst;
+    char *name;
+    enum resource_type type;
+    void *dst;
 } ResourcePref;
 
 /* function declarations */
@@ -264,6 +264,7 @@ static void tagmon(const Arg *arg);
 static void tagnextmon(const Arg *arg);
 static void tagprevmon(const Arg *arg);
 static void tagothermon(const Arg *arg, int dir);
+static void tcl(Monitor *);
 static void tile(Monitor *);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
@@ -1960,9 +1961,78 @@ tagothermon(const Arg *arg, int dir)
 }
 
 void
+tcl(Monitor * m)
+{
+    int x, y, h, w, mw, sw, bdw;
+    unsigned int i, n;
+    Client * c;
+
+    for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+    if (n == 0) /* No tiled windows on monitor */
+        return;
+
+    c = nexttiled(m->clients);
+
+    mw = m->mfact * m->ww - m->gap->gappx; /* master width */
+    sw = (m->ww - mw - m->gap->gappx) / 2; /* slave width */
+    bdw = (2 * c->bw); /* border double width */
+    resize(c,
+	   n < 3 ? m->wx + m->gap->gappx : m->wx + sw + m->gap->gappx,
+           m->wy + m->gap->gappx,
+	   n == 1 ? m->ww - bdw - 2*m->gap->gappx : mw - bdw - m->gap->gappx,
+	   m->wh - bdw - 2*m->gap->gappx,
+           False); /* place master */
+
+    if (--n == 0)
+        return;
+
+    w = (m->ww - mw - m->gap->gappx) / ((n > 1) + 1);
+    c = nexttiled(c->next);
+
+    if (n > 1)
+    {
+        x = m->wx + ((n > 1) ? mw + sw : mw) + m->gap->gappx;
+        y = m->wy + m->gap->gappx;
+        h = m->wh / (n / 2) - m->gap->gappx;
+
+        if (h < bh)
+            h = m->wh;
+
+        for (i = 0; c && i < n / 2; c = nexttiled(c->next), i++)
+        {
+            resize(c, x, y,
+		   w - bdw - m->gap->gappx,
+                   (i + 1 == n / 2) ? m->wy + m->wh - y - bdw - m->gap->gappx : h - bdw - m->gap->gappx,
+                   False);
+
+            if (h != m->wh)
+                y = c->y + HEIGHT(c) + m->gap->gappx;
+        }
+    }
+
+    x = ((n + 1 / 2) == 1 ? mw : m->wx) + m->gap->gappx;
+    y = m->wy + m->gap->gappx;
+    h = m->wh / ((n + 1) / 2) - m->gap->gappx;
+
+    if (h < bh)
+        h = m->wh;
+
+    for (i = 0; c; c = nexttiled(c->next), i++)
+    {
+        resize(c, x, y,
+	       w - bdw - m->gap->gappx,
+               (i + 1 == (n + 1) / 2) ? m->wy + m->wh - y - bdw - m->gap->gappx : h - bdw - m->gap->gappx,
+               False);
+
+        if (h != m->wh)
+            y = c->y + HEIGHT(c) + m->gap->gappx;
+    }
+}
+
+void
 tile(Monitor *m)
 {
-    unsigned int i, n, h, mw, my, ty;
+    unsigned int i, n, h, mw, my, ty, bdw;
     Client *c;
 
     for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
@@ -1973,20 +2043,23 @@ tile(Monitor *m)
         mw = m->nmaster ? m->ww * m->mfact : 0;
     else
         mw = m->ww - m->gap->gappx;
-    for (i = 0, my = ty = m->gap->gappx, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+
+    for (i = 0, my = ty = m->gap->gappx, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++) {
+	bdw = (2*c->bw);
         if (i < m->nmaster) {
             h = (m->wh - my) / (MIN(n, m->nmaster) - i) - m->gap->gappx;
-            resize(c, m->wx + m->gap->gappx, m->wy + my, mw - (2*c->bw) - m->gap->gappx, h - (2*c->bw), 0);
+            resize(c, m->wx + m->gap->gappx, m->wy + my, mw - bdw - m->gap->gappx, h - bdw, 0);
             if (my + HEIGHT(c) + m->gap->gappx < m->wh)
                 my += HEIGHT(c) + m->gap->gappx;
 
         } else {
             h = (m->wh - ty) / (n - i) - m->gap->gappx;
-            resize(c, m->wx + mw + m->gap->gappx, m->wy + ty, m->ww - mw - (2*c->bw) - 2*m->gap->gappx, h - (2*c->bw), 0);
+            resize(c, m->wx + mw + m->gap->gappx, m->wy + ty, m->ww - mw - bdw - 2*m->gap->gappx, h - bdw, 0);
             if (ty + HEIGHT(c) + m->gap->gappx < m->wh)
                 ty += HEIGHT(c) + m->gap->gappx;
 
         }
+    }
 }
 
 void
@@ -2241,8 +2314,8 @@ updategeom(void)
                     attachBelow(c);
                     attachstack(c);
                 }
-		if (m == selmon)
-		    selmon = mons;
+                if (m == selmon)
+                    selmon = mons;
                 cleanupmon(m);
             }
         }
@@ -2626,55 +2699,55 @@ zoom(const Arg *arg)
 void
 resource_load(XrmDatabase db, char *name, enum resource_type rtype, void *dst)
 {
-	char *sdst = NULL;
-	int *idst = NULL;
-	float *fdst = NULL;
+    char *sdst = NULL;
+    int *idst = NULL;
+    float *fdst = NULL;
 
-	sdst = dst;
-	idst = dst;
-	fdst = dst;
+    sdst = dst;
+    idst = dst;
+    fdst = dst;
 
-	char fullname[256];
-	char *type;
-	XrmValue ret;
+    char fullname[256];
+    char *type;
+    XrmValue ret;
 
-	snprintf(fullname, sizeof(fullname), "%s.%s", "dwm", name);
-	fullname[sizeof(fullname) - 1] = '\0';
+    snprintf(fullname, sizeof(fullname), "%s.%s", "dwm", name);
+    fullname[sizeof(fullname) - 1] = '\0';
 
-	XrmGetResource(db, fullname, "*", &type, &ret);
-	if (!(ret.addr == NULL || strncmp("String", type, 64)))
-	{
-		switch (rtype) {
-		case STRING:
-			strcpy(sdst, ret.addr);
-			break;
-		case INTEGER:
-			*idst = strtoul(ret.addr, NULL, 10);
-			break;
-		case FLOAT:
-			*fdst = strtof(ret.addr, NULL);
-			break;
-		}
-	}
+    XrmGetResource(db, fullname, "*", &type, &ret);
+    if (!(ret.addr == NULL || strncmp("String", type, 64)))
+    {
+        switch (rtype) {
+        case STRING:
+            strcpy(sdst, ret.addr);
+            break;
+        case INTEGER:
+            *idst = strtoul(ret.addr, NULL, 10);
+            break;
+        case FLOAT:
+            *fdst = strtof(ret.addr, NULL);
+            break;
+        }
+    }
 }
 
 void
 load_xresources(void)
 {
-	Display *display;
-	char *resm;
-	XrmDatabase db;
-	ResourcePref *p;
+    Display *display;
+    char *resm;
+    XrmDatabase db;
+    ResourcePref *p;
 
-	display = XOpenDisplay(NULL);
-	resm = XResourceManagerString(display);
-	if (!resm)
-		return;
+    display = XOpenDisplay(NULL);
+    resm = XResourceManagerString(display);
+    if (!resm)
+        return;
 
-	db = XrmGetStringDatabase(resm);
-	for (p = resources; p < resources + LENGTH(resources); p++)
-		resource_load(db, p->name, p->type, p->dst);
-	XCloseDisplay(display);
+    db = XrmGetStringDatabase(resm);
+    for (p = resources; p < resources + LENGTH(resources); p++)
+        resource_load(db, p->name, p->type, p->dst);
+    XCloseDisplay(display);
 }
 
 int
