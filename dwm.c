@@ -895,10 +895,12 @@ drawbar(Monitor *m)
         x += w;
     }
 
-    /* do not draw layout symbol */
-    // w = blw = TEXTW(m->ltsymbol);
-    // drw_setscheme(drw, scheme[SchemeNorm]);
-    // x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0, False);
+    /* Only allocate a small amount of space for the layout symbol; the output
+     * of TEXTW is unreliable because it doesn't recognize Pango markup */
+    //w = blw = TEXTW(m->ltsymbol);
+    w = blw = 40;
+    drw_setscheme(drw, scheme[SchemeNorm]);
+    x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0, True);
 
     if ((w = m->ww - tw - x) > bh) {
         drw_setscheme(drw, scheme[SchemeNorm]);

@@ -44,10 +44,11 @@ static int nmaster     = 1;    /* number of clients in master area */
 static int resizehints = 1;    /* 1 means respect size hints in tiled resizals */
 
 static const Layout layouts[] = {
-	/* symbol     arrange function */
-	{ "[]=",      tile },    /* first entry is default */
-	{ "><>",      NULL },    /* no layout function means floating behavior */
-	{ "[M]",      monocle },
+	/* symbol                  arrange function */
+	{ "<span size=\"20000\" foreground=\"#b24d1b\">󰕮</span>",      tile },    /* first entry is default */
+	{ "<span size=\"20000\" foreground=\"#b24d1b\">󰅟</span>",      NULL },    /* no layout function means floating behavior */
+	{ "<span size=\"20000\" foreground=\"#b24d1b\">󰕬</span>",      tcl },     /* three column layout */
+	{ "<span size=\"20000\" foreground=\"#b24d1b\">󰝣</span>",      monocle },
 };
 
 /* key definitions */
