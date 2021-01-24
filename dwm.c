@@ -857,6 +857,8 @@ dirtomon(int dir)
     if (dir > 0) {
         if (!(m = selmon->next))
             m = mons;
+    } else if (dir == 0) {
+	return mons;
     } else if (selmon == mons)
         for (m = mons; m->next; m = m->next);
     else
